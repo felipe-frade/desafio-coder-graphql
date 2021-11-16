@@ -2,12 +2,47 @@ const db = require('../../config/db')
 
 module.exports = {
     async novoPerfil(_, { dados }) {
-        // implementar
+        const { nome, rotulo } = dados
+        let perfil = await db('perfis').where({ nome }).first()
+        if(!perfil){
+            await db('perfis').insert( { nome, rotulo } )
+            perfil = await db('perfis').where({ nome }).first()
+        }else{
+            throw new Error('Perfil ja existe!')
+        }
+        return perfil
     },
     async excluirPerfil(_, { filtro }) {
-        // implementar
+        const { id, nome } = filtro
+        let perfil = null
+        if(id){
+            perfil = await db('perfis').where({ id }).first()
+        }else if(nome){
+            perfil = await db('perfis').where({ nome }).first()
+        }
+        if(perfil){
+            await db('perfis').where({ id: perfil.id }).del()
+
+            return perfil
+        }else{
+            throw new Error('Perfil não existe!')
+        }
     },
     async alterarPerfil(_, { filtro, dados }) {
-        // implementar
+        const { nome, rotulo } = dados
+        let perfil = null
+        if(filtro.id){
+            perfil = await db('perfis').where({ id: filtro.id }).first()
+        }else if(filtro.nome){
+            perfil = await db('perfis').where({ nome: filtro.nome }).first()
+        }
+
+        if(perfil){
+            await db('perfis').update({ ...perfil, nome, rotulo }).where({ id: filtro.id })
+
+            return await db('perfis').where({ id: perfil.id }).first()
+        }else{
+            throw new Error('Perfil não existe!')
+        }
     }
 }

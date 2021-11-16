@@ -2,9 +2,17 @@ const db = require('../../config/db')
 
 module.exports = {
     async perfis() {
-        // implementar
+        return db('perfis')
     },
     async perfil(_, { filtro }) {
-        // implementar
+        const { id, nome } = filtro
+
+        if(id){
+            return db('perfis').where({id}).first()
+        }else if(nome){
+            return db('perfis').where({nome}).first()
+        }else{
+            throw new Error('Parametro não reconhecido!')
+        }
     }
 }
