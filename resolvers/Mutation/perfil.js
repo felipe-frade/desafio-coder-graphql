@@ -1,4 +1,5 @@
 const db = require('../../config/db')
+const { perfil: get_perfil } = require('../Query/perfil')
 
 module.exports = {
     async novoPerfil(_, { dados }) {
@@ -14,12 +15,7 @@ module.exports = {
     },
     async excluirPerfil(_, { filtro }) {
         const { id, nome } = filtro
-        let perfil = null
-        if(id){
-            perfil = await db('perfis').where({ id }).first()
-        }else if(nome){
-            perfil = await db('perfis').where({ nome }).first()
-        }
+        let perfil = await get_perfil(_, { filtro })
         if(perfil){
             await db('perfis').where({ id: perfil.id }).del()
 
